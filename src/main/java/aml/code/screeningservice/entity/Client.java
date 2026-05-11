@@ -1,18 +1,21 @@
 package aml.code.screeningservice.entity;
 
 import aml.code.screeningservice.entity.enums.ClientStatus;
+import aml.code.screeningservice.entity.users.Auditable;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "clients")
-public class Client {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@NoArgsConstructor
+@Getter
+@Setter
+public class Client extends Auditable {
 
     @Column(nullable = false)
     private String fullName;
@@ -31,7 +34,4 @@ public class Client {
 
     @Enumerated(EnumType.STRING)
     private ClientStatus status;
-
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
 }

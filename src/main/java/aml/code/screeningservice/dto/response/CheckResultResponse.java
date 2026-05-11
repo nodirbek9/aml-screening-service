@@ -1,12 +1,16 @@
 package aml.code.screeningservice.dto.response;
 
+import aml.code.screeningservice.entity.enums.MatchResult;
 import lombok.Data;
+
+import java.time.LocalDateTime;
 
 @Data
 public class CheckResultResponse {
-    private String matchScore;
-    private String result;
-    private String threshold;
-    private String checkedDate;
+    private Double matchScore;
+    private MatchResult result;
+    private Double threshold;
+    private Long matchedEntryId;
+    private LocalDateTime checkDate;
     private String algorithm;
 }

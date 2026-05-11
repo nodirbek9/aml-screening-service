@@ -1,19 +1,22 @@
 package aml.code.screeningservice.entity;
 
 import aml.code.screeningservice.entity.enums.EntryStatus;
+import aml.code.screeningservice.entity.users.Auditable;
 import jakarta.persistence.*;
 import aml.code.screeningservice.entity.enums.ListType;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "blacklist_entries")
-public class BlacklistEntry {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@NoArgsConstructor
+@Getter
+@Setter
+public class BlacklistEntry extends Auditable {
 
     @Column(nullable = false)
     private String fullName;
@@ -34,8 +37,6 @@ public class BlacklistEntry {
 
     @Column(nullable = false)
     private LocalDateTime addedAt;
-
-    private LocalDateTime updatedAt;
 
     private String addedBy;
 }

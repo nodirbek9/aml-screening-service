@@ -1,4 +1,48 @@
 package aml.code.screeningservice.controller;
 
+import aml.code.screeningservice.dto.request.BlacklistEntryRequest;
+import aml.code.screeningservice.entity.enums.EntryStatus;
+import aml.code.screeningservice.service.BlacklistService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/blacklist")
+@RequiredArgsConstructor
 public class BlacklistController {
+
+    private final BlacklistService blacklistService;
+
+    @PostMapping
+    public ResponseEntity<?> create(@RequestBody @Valid BlacklistEntryRequest request, @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(blacklistService.create(request, userDetails.getUsername()));
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getAll(@RequestParam(required = false) EntryStatus status,
+                                    @RequestParam(defaultValue = "0") int page,
+                                    @RequestParam(defaultValue = "10") int size,
+                                    Pageable pageable) {
+            return ResponseEntity.ok(blacklistService.getAll(status, pageable));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getById (@PathVariable Long id){
+        return ResponseEntity.ok(blacklistService.getById(id));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody BlacklistEntryRequest request) {
+        return ResponseEntity.ok(blacklistService.update(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        return ResponseEntity.ok(blacklistService.delete(id));
+    }
 }

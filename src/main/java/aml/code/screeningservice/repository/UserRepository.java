@@ -1,4 +1,4 @@
 package aml.code.screeningservice.repository;
 
-public class UserRepository {
+public interface UserRepository {
 }

@@ -1,17 +1,20 @@
 package aml.code.screeningservice.entity;
 
 import aml.code.screeningservice.entity.enums.MatchResult;
+import aml.code.screeningservice.entity.users.Auditable;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "check_results")
-public class CheckResult {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@NoArgsConstructor
+@Getter
+@Setter
+public class CheckResult extends Auditable {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "transaction_id", nullable = false)
@@ -34,5 +37,5 @@ public class CheckResult {
     @Column(nullable = false)
     private LocalDateTime checkDate;
 
-    private String algorothm;                   // "LEVENSHTEIN" / "JARO_WINKLER"
+    private String algorithm;           // "LEVENSHTEIN" / "JARO_WINKLER"
 }
