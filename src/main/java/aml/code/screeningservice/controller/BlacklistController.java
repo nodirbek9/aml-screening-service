@@ -19,8 +19,9 @@ public class BlacklistController {
     private final BlacklistService blacklistService;
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody @Valid BlacklistEntryRequest request, @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(blacklistService.create(request, userDetails.getUsername()));
+    public ResponseEntity<?> create(@RequestBody @Valid BlacklistEntryRequest request, @AuthenticationPrincipal(errorOnInvalidType = false) UserDetails userDetails) {
+        String username = (userDetails != null) ? userDetails.getUsername() : "bek";
+        return ResponseEntity.ok(blacklistService.create(request, username));
     }
 
     @GetMapping

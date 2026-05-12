@@ -22,8 +22,8 @@ public class Client extends Auditable {
 
     private LocalDate birthday;
 
-    @Column(nullable = false)
-    private String passwordNumber;
+    @Column(name = "passport_number", nullable = false)
+    private String passportNumber;
 
     private String inn;
 

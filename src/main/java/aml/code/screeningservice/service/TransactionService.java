@@ -1,16 +1,23 @@
 package aml.code.screeningservice.service;
 
 
+import aml.code.screeningservice.dto.ClientTransactionFilter;
 import aml.code.screeningservice.dto.request.TransactionRequest;
 import aml.code.screeningservice.dto.response.TransactionResponse;
+import aml.code.screeningservice.entity.Client;
 import aml.code.screeningservice.entity.Transaction;
 import aml.code.screeningservice.entity.enums.TransactionStatus;
 import aml.code.screeningservice.mapper.TransactionMapper;
+import aml.code.screeningservice.repository.ClientRepository;
 import aml.code.screeningservice.repository.TransactionRepository;
+import aml.code.screeningservice.specifications.ClientSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -18,30 +25,49 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
+    private final ClientRepository clientRepository;
+    private final ScreeningService screeningService;
 
-//    public List<Transaction> getClientTransactions(ClientTransactionFilter filter) {
-//        ClientSpecification spec = new ClientSpecification(filter);
-//
-//        return null;
-//    }
+    public List<Transaction> getClientTransactions(ClientTransactionFilter filter) {
+        ClientSpecification spec = new ClientSpecification(filter);
+        return null;
+    }
 
     public Long createTransaction(TransactionRequest request) {
+
+        Client client = clientRepository.findById(request.getClientId()).orElseThrow(
+                () -> new RuntimeException("client.not.found")
+        );
+
         Transaction transaction = transactionMapper.toEntity(request);
-        return transactionRepository.save(transaction).getId();
+        transaction.setClient(client);
+        transaction.setStatus(TransactionStatus.PENDING);
+        transaction.setCreatedAt(LocalDateTime.now());
+
+        Transaction savedTransaction = transactionRepository.save(transaction);
+
+        screeningService.screen(savedTransaction);
+
+        Transaction updatedTransaction = transactionRepository.findById(savedTransaction.getId())
+                .orElseThrow(() -> new RuntimeException("transaction.not.found"));
+        return updatedTransaction.getId();
     }
 
     public Page<TransactionResponse> getAllTransactions(TransactionStatus status, Pageable pageable) {
+        Page<Transaction> allByStatus;
         if (status != null) {
-            Page<Transaction> allByStatus = transactionRepository.findAllByStatus(status, pageable);
-            return allByStatus.map(transactionMapper::toResponse);
+            allByStatus = transactionRepository.findAllByStatus(status, pageable);
+        } else {
+            allByStatus = transactionRepository.findAll(pageable);
         }
-        return transactionRepository.findAll(pageable).map(transactionMapper::toResponse);
+        return allByStatus.map(transactionMapper::toResponse);
     }
 
     public TransactionResponse getTransactionById(Long id) {
         Transaction transaction = transactionRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("transaction.not.found")
         );
+        TransactionResponse response = transactionMapper.toResponse(transaction);
         return transactionMapper.toResponse(transaction);
     }
 }

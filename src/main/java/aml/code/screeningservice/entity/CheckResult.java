@@ -16,11 +16,11 @@ import java.time.LocalDateTime;
 @Setter
 public class CheckResult extends Auditable {
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "transaction_id", nullable = false)
     private Transaction transaction;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "matched_entry_id")
     private BlacklistEntry matchedEntry;    //null если CLEAR
 

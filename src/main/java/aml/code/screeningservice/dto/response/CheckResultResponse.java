@@ -7,10 +7,12 @@ import java.time.LocalDateTime;
 
 @Data
 public class CheckResultResponse {
+    private Long id;
+    private String result;        // HIT yoki CLEAR
     private Double matchScore;
-    private MatchResult result;
     private Double threshold;
-    private Long matchedEntryId;
-    private LocalDateTime checkDate;
     private String algorithm;
+    private String checkDate;
+    private Long matchedEntryId;  // Agar HIT bo'lsa
+    private String matchedEntryName;
 }

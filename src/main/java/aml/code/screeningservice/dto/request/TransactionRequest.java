@@ -14,6 +14,8 @@ public class TransactionRequest {
     @NotBlank
     @Size(min = 2, max = 255)
     private String recipientName;
+    @Size(min = 4, max = 50, message = "Passport number must be between 4 and 50 characters")
+    private String recipientPassport;
     @NonNull
     @Positive(message = "Amount must be positive")
     private String amount;

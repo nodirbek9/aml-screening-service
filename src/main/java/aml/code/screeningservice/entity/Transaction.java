@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Setter
 public class Transaction extends Auditable {
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
@@ -36,5 +36,9 @@ public class Transaction extends Auditable {
     private TransactionStatus status;
 
     private String reviewedBy;      //username офицера, принявшего решение
+
     private String reviewComment;       // коментарии к решению
+
+    @OneToOne(mappedBy = "transaction")
+    private CheckResult checkResult;
 }

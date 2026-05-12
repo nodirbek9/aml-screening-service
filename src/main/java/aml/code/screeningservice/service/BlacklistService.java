@@ -24,7 +24,7 @@ public class BlacklistService {
     public Long create(BlacklistEntryRequest request, String addedBy) {
         BlacklistEntry entry = blackListMapper.toEntity(request);
         entry.setStatus(EntryStatus.ACTIVE);
-        entry.setCreatedAt(LocalDateTime.now());
+        entry.setAddedAt(LocalDateTime.now());
         entry.setAddedBy(addedBy);
         return blacklistRepository.save(entry).getId();
 

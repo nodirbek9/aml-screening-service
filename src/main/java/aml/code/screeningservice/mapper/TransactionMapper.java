@@ -6,7 +6,7 @@ import aml.code.screeningservice.entity.Transaction;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = CheckResultMapper.class)
 public interface TransactionMapper {
 
     @Mapping(target = "id", ignore = true)

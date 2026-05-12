@@ -1,10 +1,14 @@
 package aml.code.screeningservice.dto.response;
 
+import aml.code.screeningservice.entity.enums.TransactionStatus;
+import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
+@Builder
 public class TransactionResponse {
     private Long id;
     private Long clientId;
@@ -13,10 +17,10 @@ public class TransactionResponse {
     private String recipientPassport;
     private BigDecimal amount;
     private String currency;
-    private String status;
-    private String createdAt;
-    private String updatedAt;
+    private TransactionStatus status;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private String reviewedBy;
     private String reviewComment;
-    private String checkResult;
+    private CheckResultResponse checkResult;
 }
