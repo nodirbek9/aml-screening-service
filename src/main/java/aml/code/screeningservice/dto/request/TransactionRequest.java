@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NonNull;
 
+import java.math.BigDecimal;
+
 @Data
 public class TransactionRequest {
     @NonNull
@@ -18,7 +20,7 @@ public class TransactionRequest {
     private String recipientPassport;
     @NonNull
     @Positive(message = "Amount must be positive")
-    private String amount;
+    private BigDecimal amount;
 
     @NotBlank
     @Pattern(regexp = "^[A-Z]{3}$", message = "Currency must be a three-upper case letters")

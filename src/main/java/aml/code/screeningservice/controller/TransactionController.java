@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,11 +18,13 @@ public class TransactionController {
 
     private final TransactionService transactionService;
 
+    @PreAuthorize("hasAnyRole('ADMIN','OPERATOR')")
     @PostMapping
     public ResponseEntity<?> createTransaction(@RequestBody @Valid TransactionRequest request) {
         return ResponseEntity.ok(transactionService.createTransaction(request));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','OPERATOR', 'COMPLIANCE_OFFICER')")
     @GetMapping
     public ResponseEntity<?> getAllTransactions(@RequestParam(required = false) TransactionStatus status,
                                                 @RequestParam(defaultValue = "0") int page,
@@ -30,7 +33,8 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.getAllTransactions(status, pageable));
     }
 
-    @GetMapping("{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','OPERATOR', 'COMPLIANCE_OFFICER')")
+    @GetMapping("{/id}")
     public ResponseEntity<?> getTransactionById(@PathVariable Long id) {
         return ResponseEntity.ok(transactionService.getTransactionById(id));
     }

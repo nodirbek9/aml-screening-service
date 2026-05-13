@@ -1,5 +1,6 @@
 package aml.code.screeningservice.handler;
 
+import aml.code.screeningservice.exception.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -8,8 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import aml.code.screeningservice.exception.GenericNotFoundException;
-import aml.code.screeningservice.exception.InvalidDataException;
 import aml.code.screeningservice.util.ErrorUtil;
 import aml.code.screeningservice.util.Translator;
 
@@ -25,25 +24,53 @@ public class GlobalExceptionHandler {
 
     private final Translator translator;
 
-    @ExceptionHandler(GenericNotFoundException.class)
-    public ResponseEntity<Object> handleGenericNotFoundException(GenericNotFoundException ex) {
-        log.error("GenericNotFoundException on: {}", ErrorUtil.getStacktrace(ex));
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Object> handleResourceNotFound(ResourceNotFoundException ex) {
+        log.error("ResourceNotFoundException on: {}", ErrorUtil.getStacktrace(ex));
         return new ResponseEntity<>(Map.of("message", List.of(translator.toLocale(ex.getMessage()))),
                 HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException ex) {
-        log.error("AccessDeniedException on: {}", ErrorUtil.getStacktrace(ex));
+    @ExceptionHandler(InvalidInputException.class)
+    public ResponseEntity<Object> handleInvalidInput(InvalidInputException ex) {
+        log.error("InvalidInputException on: {}", ErrorUtil.getStacktrace(ex));
+        return new ResponseEntity<>(Map.of("message", List.of(translator.toLocale(ex.getMessage()))),
+                HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<Object> handleDuplicateResource(DuplicateResourceException ex) {
+        log.error("DuplicateResourceException on: {}", ErrorUtil.getStacktrace(ex));
+        return new ResponseEntity<>(Map.of("message", List.of(translator.toLocale(ex.getMessage()))),
+                HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(InvalidCredentialException.class)
+    public ResponseEntity<Object> handleInvalidCredential(InvalidCredentialException ex) {
+        log.error("InvalidCredentialException on: {}", ErrorUtil.getStacktrace(ex));
         return new ResponseEntity<>(Map.of("message", List.of(translator.toLocale(ex.getMessage()))),
                 HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler(InvalidDataException.class)
-    public ResponseEntity<Object> handleInvalidDataException(InvalidDataException ex) {
+    @ExceptionHandler(InvalidStatusTransitionException.class)
+    public ResponseEntity<Object> handleInvalidStatusTransition(InvalidStatusTransitionException ex) {
+        log.error("InvalidStatusTransitionException on: {}", ErrorUtil.getStacktrace(ex));
         return new ResponseEntity<>(Map.of("message", List.of(translator.toLocale(ex.getMessage()))),
-        HttpStatus.BAD_REQUEST
-        );
+                HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UnauthorizedActionException.class)
+    public ResponseEntity<Object> handleUnauthorizedAction(UnauthorizedActionException ex) {
+        log.error("UnauthorizedActionException on: {}", ErrorUtil.getStacktrace(ex));
+        return new ResponseEntity<>(Map.of("message", List.of(translator.toLocale(ex.getMessage()))),
+                HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Object> handleUserNotFound(UserNotFoundException ex) {
+        log.error("UserNotFoundException on: {}", ErrorUtil.getStacktrace(ex));
+        return new ResponseEntity<>(Map.of("message", List.of(translator.toLocale(ex.getMessage()))),
+                HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

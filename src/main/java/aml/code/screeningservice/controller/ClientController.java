@@ -7,6 +7,7 @@ import aml.code.screeningservice.service.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,22 +20,21 @@ public class ClientController {
     private final ClientService clientService;
     private final TransactionService transactionService;
 
+    @PreAuthorize("hasAnyRole('ADMIN','OPERATOR')")
     @PostMapping
     public ResponseEntity<?> createClient(@RequestBody @Valid ClientRequest request) {
         return ResponseEntity.ok(clientService.create(request));
     }
+
+    @PreAuthorize("hasAnyRole('ADMIN','OPERATOR', 'COMPLIANCE_OFFICER')")
     @GetMapping
     public ResponseEntity<?> getAllClients() {
         return ResponseEntity.ok(clientService.getAll());
     }
+
+    @PreAuthorize("hasAnyRole('ADMIN','OPERATOR', 'COMPLIANCE_OFFICER')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getClientById(@PathVariable Long id) {
         return ResponseEntity.ok(clientService.getById(id));
     }
-//    @GetMapping("/{id}/transactions")
-//    public ResponseEntity<?> getClientTransactions(@PathVariable Long id, @RequestParam Integer page,
-//                                                   @RequestParam Integer limit,
-//                                                   @RequestParam(required = false) List<String> status) {
-//        return ResponseEntity.ok(transactionService.getClientTransactions(new ClientTransactionFilter(id, page, limit, status)));
-//    }
 }

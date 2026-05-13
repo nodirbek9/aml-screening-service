@@ -1,6 +1,6 @@
 package aml.code.screeningservice.dto.response;
 
-import aml.code.screeningservice.entity.enums.Role;
+import aml.code.screeningservice.entity.enums.UserRole;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -10,7 +10,7 @@ public class UserResponse {
     private Long id;
     private String username;
     private String email;
-    private Role role;
+    private UserRole role;
     private Boolean active;
     private LocalDateTime createdAt;
 }

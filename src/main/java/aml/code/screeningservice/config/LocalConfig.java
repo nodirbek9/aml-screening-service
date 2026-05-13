@@ -13,7 +13,7 @@ public class LocalConfig {
     @Bean
     public LocaleResolver localeResolver() {
         SessionLocaleResolver localeResolver = new SessionLocaleResolver();
-        localeResolver.setDefaultLocale(Locale.of("uz"));
+        localeResolver.setDefaultLocale(Locale.of("ru"));
         return localeResolver;
     }
 

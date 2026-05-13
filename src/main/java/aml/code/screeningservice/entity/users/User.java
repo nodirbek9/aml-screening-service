@@ -1,6 +1,6 @@
 package aml.code.screeningservice.entity.users;
 
-import aml.code.screeningservice.entity.enums.Role;
+import aml.code.screeningservice.entity.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,7 +29,7 @@ public class User extends Auditable implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;
+    private UserRole role;
 
     @Column(nullable = false)
     private Boolean active;

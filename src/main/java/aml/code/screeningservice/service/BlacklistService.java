@@ -4,6 +4,10 @@ import aml.code.screeningservice.dto.request.BlacklistEntryRequest;
 import aml.code.screeningservice.dto.response.BlacklistEntryResponse;
 import aml.code.screeningservice.entity.BlacklistEntry;
 import aml.code.screeningservice.entity.enums.EntryStatus;
+import aml.code.screeningservice.exception.DuplicateResourceException;
+import aml.code.screeningservice.exception.InvalidInputException;
+import aml.code.screeningservice.exception.InvalidStatusTransitionException;
+import aml.code.screeningservice.exception.ResourceNotFoundException;
 import aml.code.screeningservice.mapper.BlackListMapper;
 import aml.code.screeningservice.repository.BlacklistRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,17 +23,20 @@ public class BlacklistService {
 
     private final BlacklistRepository blacklistRepository;
     private final BlackListMapper blackListMapper;
-    private static final String EXCEPTION_MESSAGE = "client.not.found";
+    private static final String EXCEPTION_MESSAGE = "black.list.not.found";
 
     public Long create(BlacklistEntryRequest request, String addedBy) {
         BlacklistEntry entry = blackListMapper.toEntity(request);
+        if (blacklistRepository.existsByPassportNumber((request.getPassportNumber()))) {
+            throw new DuplicateResourceException("passport.already.exists");
+        }
         entry.setStatus(EntryStatus.ACTIVE);
         entry.setAddedAt(LocalDateTime.now());
+        if (addedBy == null) {
+          throw new InvalidInputException("addedBy.cannot.be.null");
+        }
         entry.setAddedBy(addedBy);
         return blacklistRepository.save(entry).getId();
-
-
-
     }
 
     public Page<BlacklistEntryResponse> getAll(EntryStatus status, Pageable pageable) {
@@ -39,14 +46,14 @@ public class BlacklistService {
 
     public BlacklistEntryResponse getById(Long id) {
         BlacklistEntry entry = blacklistRepository.findById(id).orElseThrow(
-                () -> new RuntimeException(EXCEPTION_MESSAGE)
+                () -> new ResourceNotFoundException(EXCEPTION_MESSAGE)
         );
         return blackListMapper.toResponse(entry);
     }
 
     public Boolean update(Long id, BlacklistEntryRequest request) {
         BlacklistEntry entry = blacklistRepository.findById(id).orElseThrow(
-                () -> new RuntimeException(EXCEPTION_MESSAGE)
+                () -> new ResourceNotFoundException(EXCEPTION_MESSAGE)
         );
         blackListMapper.updateFromRequest(request, entry);
         entry.setUpdatedAt(LocalDateTime.now());
@@ -56,10 +63,10 @@ public class BlacklistService {
 
     public Boolean delete(Long id) {
         BlacklistEntry entry = blacklistRepository.findById(id).orElseThrow(
-                () -> new RuntimeException(EXCEPTION_MESSAGE)
+                () -> new ResourceNotFoundException(EXCEPTION_MESSAGE)
         );
         if (entry.getStatus() == EntryStatus.INACTIVE) {
-            throw new RuntimeException("entry.already.deleted");
+            throw new InvalidStatusTransitionException("entry.already.deleted");
         }else {
             entry.setStatus(EntryStatus.INACTIVE);
             entry.setUpdatedAt(LocalDateTime.now());

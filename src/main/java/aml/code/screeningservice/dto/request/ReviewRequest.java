@@ -1,11 +1,11 @@
 package aml.code.screeningservice.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
 public class ReviewRequest {
 
-    // Комментарий необязателен для submit-review
-    // Желательен для approve и reject
+    @NotBlank(message = "Comment is required for review actions")
     private String comment;
 }

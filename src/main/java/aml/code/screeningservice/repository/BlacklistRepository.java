@@ -13,4 +13,6 @@ public interface BlacklistRepository extends JpaRepository<BlacklistEntry, Long>
     Page<BlacklistEntry> findByStatus(EntryStatus status, Pageable pageable);
 
     List<BlacklistEntry> findAllByStatus(EntryStatus status);
+
+    boolean existsByPassportNumber(String passportNumber);
 }
