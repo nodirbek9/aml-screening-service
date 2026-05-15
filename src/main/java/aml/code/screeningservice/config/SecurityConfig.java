@@ -29,9 +29,9 @@ public class SecurityConfig {
     private final GlobalFilter globalFilter;
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
-    public static String[] AUTH_WHITELIST = {
+    public static final String[] AUTH_WHITELIST = {
             "/auth/login",
-            "auth/register"
+            "/auth/register"
     };
 
     @Bean
@@ -56,7 +56,7 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of("http://localhost:7777", "http://localhost:3001", "https://hh.uz"));
+        config.setAllowedOrigins(List.of("http://localhost:7777", "http://localhost:8080", "https://hh.uz"));
         config.addAllowedHeader("*");
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
         source.registerCorsConfiguration("/**", config);

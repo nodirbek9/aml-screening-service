@@ -16,6 +16,7 @@ import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -39,35 +40,49 @@ public class ScreeningService {
         log.debug("Transaction status changed to CHECKING");
 
         String recipientName = transaction.getRecipientName();
+        log.info("Checking recipient: {}", maskFio(recipientName));
         String normalizedRecipient = normalizeText(recipientName);
         log.debug("Normalized recipient name: {}", normalizedRecipient);
 
-        List<BlacklistEntry> activeEntries = blacklistRepository.findAllByStatus(EntryStatus.ACTIVE);
-        log.debug("Found {} active blacklist entries", activeEntries.size());
 
-        if (activeEntries.isEmpty()) {
-            log.info("Blacklist is empty, marking transaction as CLEAR");
+        String firstWord = extractFirstWord(normalizedRecipient);
+        log.debug("Searching by first word: {}", firstWord);
+
+        List<BlacklistEntry> candidates = blacklistRepository.findActiveByNameContaining(EntryStatus.ACTIVE, firstWord);
+        log.debug("Found {} candidate entries", candidates.size());
+
+        if (candidates.isEmpty()) {
+            log.info("No candidates found, marking as CLEAR");
             createClearResult(transaction);
             return;
         }
 
         double maxScore = 0.0;
         BlacklistEntry bestMatch = null;
+        String bestAlgorithm = "NONE";
 
-        for (BlacklistEntry entry : activeEntries) {
+        for (BlacklistEntry entry : candidates) {
             String normalizedEntry = normalizeText(entry.getFullName());
 
-            // Levenshtein va Jaro-Winkler score'larni hisoblash
+            // Levenshtein va Jaro-Winkler считание оценок
             double levScore = calcLevenshtein(normalizedRecipient, normalizedEntry);
             double jaroScore = calcJaroWinkler(normalizedRecipient, normalizedEntry);
 
-            // Eng yaxshi score'ni tanlash
+            // Выбор самого высокой оценки
+//            if (levScore >= jaroScore && levScore > maxScore) {
+//                maxScore = levScore;
+//                bestMatch = entry;
+//                bestAlgorithm = "LEVENSHTEIN";
+//            } else if (jaroScore > maxScore) {
+//                maxScore = jaroScore;
+//                bestMatch = entry;
+//                bestAlgorithm = "JARO_WINKLER";
+//            }
             double bestScore = Math.max(levScore, jaroScore);
 
             log.debug("Comparing with '{}': Levenshtein={}, JaroWinkler={}, Best={}",
                     entry.getFullName(), levScore, jaroScore, bestScore);
 
-            // Maksimal score'ni yangilash
             if (bestScore > maxScore) {
                 maxScore = bestScore;
                 bestMatch = entry;
@@ -158,11 +173,21 @@ public class ScreeningService {
         if (text == null || text.isEmpty()) {
             return "";
         }
+        text = Normalizer.normalize(text, Normalizer.Form.NFC);
+        text = text.toLowerCase();
+        text = text.replace('ё', 'е').replace('Ё', 'Е');
+        text = text.replace("-", " ");
+        text = text.replaceAll("[^a-zа-яе\\s]", "");
+        text = text.trim().replaceAll("\\s+", " ");
+        return text;
+    }
 
-        return text.toLowerCase()
-                .trim()
-                .replaceAll("[^a-zа-яё\\s]", "")  // Faqat harflar va bo'sh joy
-                .replaceAll("\\s+", " ");          // Ko'p bo'sh joylarni bitta qilish
+    private String extractFirstWord(String normalizedText) {
+        if (normalizedText == null || normalizedText.isEmpty()) {
+            return "";
+        }
+        String[] words = normalizedText.split(" ");
+        return words.length > 0 ? words[0] : normalizedText;
     }
 
     /**
@@ -195,5 +220,26 @@ public class ScreeningService {
 
         JaroWinklerSimilarity jaroWinkler = new JaroWinklerSimilarity();
         return jaroWinkler.apply(a, b);
+    }
+
+    private String maskFio(String fullName) {
+        if (fullName == null || fullName.isEmpty()) {
+            return "";
+        }
+
+        String[] parts = fullName.trim().split("\\s+");
+        if (parts.length == 0) {
+            return "";
+        }
+
+        StringBuilder masked = new StringBuilder(parts[0]); // Full name
+
+        for (int i = 1; i < parts.length; i++) {
+            if (!parts[i].isEmpty()) {
+                masked.append(" ").append(parts[i].charAt(0)).append(".");
+            }
+        }
+
+        return masked.toString();
     }
 }

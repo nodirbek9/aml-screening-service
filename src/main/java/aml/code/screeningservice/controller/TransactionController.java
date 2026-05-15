@@ -34,7 +34,7 @@ public class TransactionController {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','OPERATOR', 'COMPLIANCE_OFFICER')")
-    @GetMapping("{/id}")
+    @GetMapping("{id}")
     public ResponseEntity<?> getTransactionById(@PathVariable Long id) {
         return ResponseEntity.ok(transactionService.getTransactionById(id));
     }

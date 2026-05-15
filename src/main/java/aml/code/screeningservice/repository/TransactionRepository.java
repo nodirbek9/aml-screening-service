@@ -13,5 +13,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
      Page<Transaction> findAllByStatus(TransactionStatus status, Pageable pageable);
 
-     P findAllByClient(Client client);
+     Page<Transaction> findAllByClient(Client client, Pageable pageable);
 }

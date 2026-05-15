@@ -12,6 +12,7 @@ import aml.code.screeningservice.mapper.TransactionMapper;
 import aml.code.screeningservice.repository.ClientRepository;
 import aml.code.screeningservice.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
@@ -28,9 +30,14 @@ public class TransactionService {
     private final ScreeningService screeningService;
 
     public Long createTransaction(TransactionRequest request) {
+        log.info("Creating transaction for client ID: {}, amount: {}",
+                request.getClientId(), request.getAmount());
 
         Client client = clientRepository.findById(request.getClientId()).orElseThrow(
-                () -> new ResourceNotFoundException("client.not.found")
+                () -> {
+                    log.error("Client not found: {}", request.getClientId());
+                    return new ResourceNotFoundException("client.not.found");
+                }
         );
 
         Transaction transaction = transactionMapper.toEntity(request);
@@ -40,10 +47,13 @@ public class TransactionService {
 
         Transaction savedTransaction = transactionRepository.save(transaction);
 
+        log.info("Transaction created with ID: {}", savedTransaction.getId());
         screeningService.screen(savedTransaction);
 
         Transaction updatedTransaction = transactionRepository.findById(savedTransaction.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("transaction.not.found"));
+        log.info("Transaction {} final status: {}",
+                updatedTransaction.getId(), updatedTransaction.getStatus());
         return updatedTransaction.getId();
     }
 
@@ -61,7 +71,6 @@ public class TransactionService {
         Transaction transaction = transactionRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("transaction.not.found")
         );
-        TransactionResponse response = transactionMapper.toResponse(transaction);
         return transactionMapper.toResponse(transaction);
     }
 }

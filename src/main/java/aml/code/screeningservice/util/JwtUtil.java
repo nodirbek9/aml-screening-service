@@ -30,7 +30,7 @@ public class JwtUtil {
                 .setClaims(extraClaims)
                 .setSubject(subject)
                 .setIssuedAt(Date.from(now))
-                .setExpiration(Date.from(now.plus(5, ChronoUnit.HOURS)))
+                .setExpiration(Date.from(now.plus(24, ChronoUnit.HOURS)))
                 .signWith(io.jsonwebtoken.SignatureAlgorithm.HS256, secret)
                 .signWith(getSignInKey(secret), SignatureAlgorithm.HS256)
                 .compact();

@@ -11,6 +11,7 @@ import aml.code.screeningservice.exception.ResourceNotFoundException;
 import aml.code.screeningservice.mapper.BlackListMapper;
 import aml.code.screeningservice.repository.BlacklistRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BlacklistService {
 
     private final BlacklistRepository blacklistRepository;
@@ -26,8 +28,10 @@ public class BlacklistService {
     private static final String EXCEPTION_MESSAGE = "black.list.not.found";
 
     public Long create(BlacklistEntryRequest request, String addedBy) {
+        log.info("Creating blacklist entry: {} by {}", request.getFullName(), addedBy);
         BlacklistEntry entry = blackListMapper.toEntity(request);
         if (blacklistRepository.existsByPassportNumber((request.getPassportNumber()))) {
+            log.warn("Duplicate passport number: {}", request.getPassportNumber());
             throw new DuplicateResourceException("passport.already.exists");
         }
         entry.setStatus(EntryStatus.ACTIVE);
@@ -36,6 +40,7 @@ public class BlacklistService {
           throw new InvalidInputException("addedBy.cannot.be.null");
         }
         entry.setAddedBy(addedBy);
+        log.info("Blacklist entry created with ID: {}", entry.getId());
         return blacklistRepository.save(entry).getId();
     }
 
