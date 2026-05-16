@@ -2,6 +2,7 @@ package aml.code.screeningservice.controller;
 
 import aml.code.screeningservice.dto.request.BlacklistEntryRequest;
 import aml.code.screeningservice.entity.enums.EntryStatus;
+import aml.code.screeningservice.entity.enums.ListType;
 import aml.code.screeningservice.service.BlacklistService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ public class BlacklistController {
 
     private final BlacklistService blacklistService;
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<?> create(@RequestBody @Valid BlacklistEntryRequest request,
                                     @AuthenticationPrincipal(errorOnInvalidType = false) UserDetails userDetails) {
@@ -29,10 +30,11 @@ public class BlacklistController {
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','OPERATOR', 'COMPLIANCE_OFFICER')")
     @GetMapping
     public ResponseEntity<?> getAll(@RequestParam(required = false) EntryStatus status,
+                                    @RequestParam(required = false) ListType listType,
                                     @RequestParam(defaultValue = "0") int page,
                                     @RequestParam(defaultValue = "10") int size,
                                     Pageable pageable) {
-            return ResponseEntity.ok(blacklistService.getAll(status, pageable));
+            return ResponseEntity.ok(blacklistService.getAll(status, listType, pageable));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','OPERATOR', 'COMPLIANCE_OFFICER')")
@@ -47,7 +49,7 @@ public class BlacklistController {
         return ResponseEntity.ok(blacklistService.update(id, request));
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         return ResponseEntity.ok(blacklistService.delete(id));

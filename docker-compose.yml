@@ -10,7 +10,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 1111
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -23,7 +23,7 @@ services:
     build: .
     container_name: aml_app
     ports:
-      - "7777:8080"
+      - "7777:7777"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/aml
       SPRING_DATASOURCE_USERNAME: postgres

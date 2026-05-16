@@ -4,6 +4,7 @@ import aml.code.screeningservice.dto.request.BlacklistEntryRequest;
 import aml.code.screeningservice.dto.response.BlacklistEntryResponse;
 import aml.code.screeningservice.entity.BlacklistEntry;
 import aml.code.screeningservice.entity.enums.EntryStatus;
+import aml.code.screeningservice.entity.enums.ListType;
 import aml.code.screeningservice.exception.DuplicateResourceException;
 import aml.code.screeningservice.exception.InvalidInputException;
 import aml.code.screeningservice.exception.InvalidStatusTransitionException;
@@ -44,8 +45,17 @@ public class BlacklistService {
         return blacklistRepository.save(entry).getId();
     }
 
-    public Page<BlacklistEntryResponse> getAll(EntryStatus status, Pageable pageable) {
-        Page<BlacklistEntry> entries = blacklistRepository.findByStatus(status, pageable);
+    public Page<BlacklistEntryResponse> getAll(EntryStatus status, ListType listType, Pageable pageable) {
+        Page<BlacklistEntry> entries;
+        if (status != null && listType != null) {
+            entries = blacklistRepository.findByStatusAndListType(status, listType, pageable);
+        } else if (status != null) {
+            entries = blacklistRepository.findByStatus(status, pageable);
+        } else if (listType != null) {
+            entries = blacklistRepository.findByListType(listType, pageable);
+        } else {
+            entries = blacklistRepository.findAll(pageable);
+        }
         return entries.map(blackListMapper::toResponse);
     }
 

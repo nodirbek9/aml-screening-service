@@ -87,7 +87,7 @@ public class GlobalFilter extends OncePerRequestFilter {
 
     private boolean isOpenPath(String currentPath) {
         for (String path : AUTH_WHITELIST) {
-            if (currentPath.startsWith(path)) {
+            if (currentPath.contains(path)) {
                 return true;
             }
         }
