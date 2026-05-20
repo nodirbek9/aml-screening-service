@@ -51,12 +51,16 @@ public class GlobalFilter extends OncePerRequestFilter {
         if (!isOpenPath(requestUri)) {
             try {
                 String token = getTokenFromRequest(request);
-                if (jwtTokenService.isValid(token)) {
+                if (token == null ){
+                    throw new InvalidInputException("Authorization token is missing");
+                }
+                if (!jwtTokenService.isValid(token)) {
+                    throw new InvalidInputException("Invalid or expired token");
+                }
                     String username = jwtTokenService.subject(token);
                     CustomUserDetails customUserDetails = userDetailsService.loadUserByUsername(username);
                     authenticate(request, customUserDetails);
                     log.info("User authenticated by id: {}", customUserDetails.getUserId());
-                }
             } catch (ResourceNotFoundException | AccessDeniedException e) {
                 log.error("Global filter error", e);
                 resolver.resolveException(request, response, null, e);
@@ -80,14 +84,13 @@ public class GlobalFilter extends OncePerRequestFilter {
         String bearerToken = request.getHeader(ApiConstants.HEADER);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer")) {
             return bearerToken.trim().substring(7);
-        } else {
-            throw new InvalidInputException("token.is.null");
         }
+        return null;
     }
 
     private boolean isOpenPath(String currentPath) {
         for (String path : AUTH_WHITELIST) {
-            if (currentPath.contains(path)) {
+            if (currentPath.startsWith(path)) {
                 return true;
             }
         }

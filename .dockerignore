@@ -1,0 +1,58 @@
+# Ignore everything that is not needed for the Docker build.
+# A small build context = faster `docker build` and smaller layers.
+
+# Local build artifacts (the image rebuilds them itself)
+build/
+.gradle/
+out/
+bin/
+target/
+*.class
+*.jar
+*.war
+
+# IDE / editor metadata
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.settings/
+.classpath
+.project
+.factorypath
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# VCS
+.git/
+.gitignore
+.gitattributes
+
+# Frontend (this Dockerfile only builds the backend)
+front/
+
+# Logs / temporary files
+*.log
+logs/
+*.tmp
+*.swp
+
+# Local secrets / env
+.env
+.env.*
+application-local.properties
+application-local.yml
+application-secret.properties
+secrets/
+
+# Docs
+README.md
+HELP.md
+LICENSE
+
+# Deploy tooling state
+.fly/
+.flyctl/

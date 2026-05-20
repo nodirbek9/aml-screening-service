@@ -27,7 +27,7 @@ public class BlacklistController {
         return ResponseEntity.ok(blacklistService.create(request, userDetails.getUsername()));
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN','OPERATOR', 'COMPLIANCE_OFFICER')")
+    @PreAuthorize("hasAnyRole('ADMIN','OPERATOR', 'COMPLIANCE_OFFICER')")
     @GetMapping
     public ResponseEntity<?> getAll(@RequestParam(required = false) EntryStatus status,
                                     @RequestParam(required = false) ListType listType,

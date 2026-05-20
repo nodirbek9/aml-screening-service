@@ -56,8 +56,8 @@ public class AuthService {
                     .build();
         }
 
-        String accessToken = jwtTokenService.generateToken(userDetails.getUsername());
-        String refreshToken = jwtTokenService.generateRefreshToken(userDetails.getUsername());
+        String accessToken = jwtTokenService.generateTokenWithRole(userDetails.getUsername(), userRole);
+        String refreshToken = jwtTokenService.generateRefreshTokenWithRole(userDetails.getUsername(), userRole);
         sessionUserRepository.save(SessionUser.builder()
                 .user(user)
                 .accessToken(accessToken)

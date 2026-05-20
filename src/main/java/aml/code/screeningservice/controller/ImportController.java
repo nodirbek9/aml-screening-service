@@ -28,7 +28,7 @@ public class ImportController {
     @PostMapping("/import")
     public ResponseEntity<ImportResultResponse> bulkImport(
             @RequestBody @Valid BulkImportRequest request,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @AuthenticationPrincipal(errorOnInvalidType = false) UserDetails userDetails) {
 
         log.info("Bulk import request by: {}", userDetails.getUsername());
 
