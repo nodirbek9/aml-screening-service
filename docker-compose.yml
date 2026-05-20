@@ -29,7 +29,9 @@ services:
       DATABASE_URL: jdbc:postgresql://postgres:5432/aml
       DB_USERNAME: postgres
       DB_PASSWORD: 1111
-      JWT_SECRET: 3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b
+      # Local-only dev secret. Generate your own with: openssl rand -hex 64
+      # Override in production via fly secrets / Koyeb env vars.
+      JWT_SECRET: ${JWT_SECRET:-local-dev-secret-replace-me-with-openssl-rand-hex-64}
       SCREENING_THRESHOLD: "0.80"
     depends_on:
       postgres:
