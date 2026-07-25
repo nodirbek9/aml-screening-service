@@ -30,6 +30,11 @@ public class SecurityConfig {
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
     public static final String[] AUTH_WHITELIST = {
+            "/swagger-ui",
+            "/swagger-ui.html",
+            "/v3/api-docs",
+            "/swagger-resources",
+            "/webjars",
             "/auth/login",
             "/auth/register"
     };
@@ -38,7 +43,13 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(AUTH_WHITELIST).permitAll()
+                        .requestMatchers("/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**",
+                                "/auth/login",
+                                "/auth/register").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer
@@ -56,9 +67,14 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of("http://localhost:7777", "http://localhost:8080", "http://localhost:3000", "https://hh.uz"));
+        config.setAllowedOrigins(List.of("http://localhost:7777",
+                "http://localhost:8080",
+                "http://localhost:3000",
+                "https://hh.uz",
+                "https://front-aml.vercel.app"));
+
         config.addAllowedHeader("*");
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
